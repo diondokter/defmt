@@ -19,6 +19,7 @@ version = "0.3.2"
 
 [features]
 alloc = []
+std-log = ["defmt-macros/std-log"]
 
 # Encoding feature flags. These should only be set by end-user crates, not by library crates.
 #

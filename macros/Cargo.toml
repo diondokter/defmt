@@ -13,6 +13,7 @@ version = "0.3.3"
 proc-macro = true
 
 [features]
+std-log = []
 # WARNING: for internal use only, not covered by semver guarantees
 unstable-test = []
 
