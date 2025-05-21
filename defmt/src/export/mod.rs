@@ -135,12 +135,16 @@ pub fn panic() -> ! {
 
 /// Implementation detail
 pub fn fmt<T: Format + ?Sized>(f: &T) {
+    std::println!("@fmt");
+
     istr(&T::_format_tag());
     f._format_data();
 }
 
 /// Implementation detail
 pub fn fmt_slice<T: Format>(values: &[T]) {
+    std::println!("@fmt_slice: len={}", values.len());
+
     usize(&values.len());
     istr(&T::_format_tag());
     for value in values {
@@ -150,36 +154,48 @@ pub fn fmt_slice<T: Format>(values: &[T]) {
 
 /// Implementation detail
 pub fn f32(b: &f32) {
+    std::println!("@f32: {}", b);
+
     write(&f32::to_bits(*b).to_le_bytes())
 }
 
 /// Implementation detail
 pub fn f64(b: &f64) {
+    std::println!("@f64: {}", b);
+
     write(&f64::to_bits(*b).to_le_bytes())
 }
 
 /// Implementation detail
 pub fn char(b: &char) {
+    std::println!("@char: `{:?}`", b);
+
     write(&(*b as u32).to_le_bytes())
 }
 
 pub fn str(s: &str) {
+    std::println!("@str: {:?}", s);
+
     usize(&s.len());
     write(s.as_bytes());
 }
 
 pub fn slice(s: &[u8]) {
+    std::println!("@slice: {:02X?}", s);
     usize(&s.len());
     write(s);
 }
 
 // NOTE: This is passed `&[u8; N]` – it's just coerced to a slice.
 pub fn u8_array(a: &[u8]) {
+    std::println!("@u8_array: {:02X?}", a);
+
     write(a);
 }
 
 // NOTE: This is passed `&[u8; N]` – it's just coerced to a slice.
 pub fn fmt_array<T: Format>(a: &[T]) {
+    std::println!("@fmt_array: len={}", a.len());
     istr(&T::_format_tag());
     for value in a {
         value._format_data();
@@ -188,22 +204,27 @@ pub fn fmt_array<T: Format>(a: &[T]) {
 
 /// Implementation detail
 pub fn istr(s: &Str) {
+    std::println!("@istr: {:X}", s.address);
     write(&s.address.to_le_bytes())
 }
 
 /// Implementation detail
 pub fn bool(b: &bool) {
+    std::println!("@bool: {}", b);
+
     u8(&(*b as u8));
 }
 
 /// Implementation detail
 pub fn debug(val: &dyn core::fmt::Debug) {
+    std::println!("@debug: {:?}", val);
     core::write!(FmtWrite, "{val:?}").ok();
     write(&[0xff]);
 }
 
 /// Implementation detail
 pub fn display(val: &dyn core::fmt::Display) {
+    std::println!("@display: {}", val);
     core::write!(FmtWrite, "{val}").ok();
     write(&[0xff]);
 }
