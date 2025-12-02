@@ -42,13 +42,33 @@ pub(crate) fn interned_string(
         format_ident!("S")
     };
 
+    let load_static = if true {
+        // Available on thumbv7 and later
+        quote! {
+            let addr: u16;
+            unsafe {
+                core::arch::asm!(
+                    "movt {addr}, :lower16:{}",
+                    sym #var_name,
+                    addr = out(reg) addr,
+                    options(nostack, pure, nomem, preserves_flags),
+                )
+            }
+            addr
+        }
+    } else {
+        quote! {
+            &#var_name as *const u8 as u16
+        }
+    };
+
     let var_addr = if cfg!(feature = "unstable-test") {
         quote!({ #defmt_path::export::fetch_add_string_index() })
     } else {
         let var_item = static_variable(&var_name, string, tag, prefix);
         quote!({
             #var_item
-            &#var_name as *const u8 as u16
+            #load_static
         })
     };
 
